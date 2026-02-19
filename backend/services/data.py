@@ -7,7 +7,8 @@ from sentence_transformers import SentenceTransformer
 
 embed_model = SentenceTransformer("all-MiniLM-L6-v2")
 
-client =Groq("YOUR_API_KEY")
+
+client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 
 def load_chunks(text , source , chunk_size =200):

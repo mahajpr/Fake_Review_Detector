@@ -3,7 +3,7 @@ from sqlalchemy import text
 from groq import Groq
 import re
  
-client = Groq("YOUR_API_KEY")
+client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 def generate_explain(review, suspicious_phrases):
 
