@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import text
 from groq import Groq
 import re
+import os
  
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
@@ -20,8 +21,7 @@ def generate_explain(review, suspicious_phrases):
 
     joined = ", ".join(phrases)
  
-    return  "This review appears suspicious due to the following signals: "
-    + joined
+    return  "This review appears suspicious due to the following signals: "+ joined
     
 def analyze_review_pipeline(review: str):
     suspicious = []
