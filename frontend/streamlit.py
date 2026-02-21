@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 import requests
@@ -8,12 +7,16 @@ st.set_page_config(
     layout="wide"
 )
 
-API_URL = "http://localhost:8000/analyze"
-API_STATS = "http://localhost:8000/stats"
+BASE_URL = "https://fakereviewdetector-production.up.railway.app"
+
+API_ANALYZE = f"{BASE_URL}/analyze"
+API_STATS = f"{BASE_URL}/stats"
+API_REVIEWS = f"{BASE_URL}/reviews"
+API_FLAGGED = f"{BASE_URL}/flagged"
+
 
 if "page" not in st.session_state:
     st.session_state.page = "Dashboard"
-
 
 st.sidebar.title("🔍 Fake Review Detection")
 
@@ -29,21 +32,24 @@ if st.sidebar.button("Flagged Reviews"):
 if st.sidebar.button("Reports"):
     st.session_state.page = "Reports"
 
-
 if st.session_state.page == "Dashboard":
 
     st.markdown("## Fake Review Detection Dashboard")
 
-    stats_response = requests.get(API_STATS)
-    if stats_response.status_code == 200:
-        stats = stats_response.json()
-    else:
-        stats = {
-            "total_reviews": 0,
-            "detected_fake": 0,
-            "flagged_reviews": 0,
-            "monthly_reviews": 0
-        }
+    try:
+        stats_response = requests.get(API_STATS, timeout=30)
+        stats = stats_response.json() if stats_response.status_code == 200 else {}
+    except:
+        stats = {}
+
+    stats_defaults = {
+        "total_reviews": 0,
+        "detected_fake": 0,
+        "flagged_reviews": 0,
+        "monthly_reviews": 0
+    }
+
+    stats = {**stats_defaults, **stats}
 
     col1, col2, col3, col4 = st.columns(4)
     col1.metric("Total Reviews", stats["total_reviews"])
@@ -58,29 +64,33 @@ if st.session_state.page == "Dashboard":
     with left:
         st.subheader("Review Analysis")
 
-        review_text = st.text_area(
-            "Customer Review",
-            height=120
-        )
+        review_text = st.text_area("Customer Review", height=120)
 
-        if st.button("Analyze Review"):
-            response = requests.post(API_URL, json={"review": review_text})
+        if st.button("Analyze Review") and review_text.strip():
+            try:
+                response = requests.post(
+                    API_ANALYZE,
+                    json={"review": review_text},
+                    timeout=60
+                )
 
-            if response.status_code == 200:
-                st.session_state.result = response.json()
-            else:
-                st.error("Backend error")
+                if response.status_code == 200:
+                    st.session_state.result = response.json()
+                else:
+                    st.error("Backend error")
+
+            except:
+                st.error("Could not connect to backend")
 
         if "result" in st.session_state:
             r = st.session_state.result
 
             st.markdown("### Explanation & Similar Reviews")
-            st.success(r["explanation"])
+            st.success(r.get("explanation", "No explanation"))
 
             st.markdown("#### 📚 Similar Historical Reviews")
-            for sim in r["similar_reviews"]:
+            for sim in r.get("similar_reviews", []):
                 st.warning(sim)
-
 
     with right:
         if "result" in st.session_state:
@@ -88,21 +98,24 @@ if st.session_state.page == "Dashboard":
 
             st.subheader("Detection Result")
 
-            if r["prediction"] == "Fake":
-                st.error(f"🚨 Fake Review — {int(r['confidence']*100)}% Confidence")
+            if r.get("prediction") == "Fake":
+                st.error(
+                    f"🚨 Fake Review — {int(r.get('confidence', 0)*100)}% Confidence"
+                )
             else:
-                st.success(f"✅ Genuine Review — {int(r['confidence']*100)}% Confidence")
+                st.success(
+                    f"✅ Genuine Review — {int(r.get('confidence', 0)*100)}% Confidence"
+                )
 
-            if r["suspicious_phrases"]:
+            if r.get("suspicious_phrases"):
                 st.markdown("**⚠️ Suspicious Phrases Detected**")
                 st.write(", ".join(r["suspicious_phrases"]))
 
         st.markdown("### Recent Review Trends")
 
-        response = requests.get("http://localhost:8000/reviews")
-
-        if response.status_code == 200:
-            data = response.json()
+        try:
+            response = requests.get(API_REVIEWS, timeout=30)
+            data = response.json() if response.status_code == 200 else []
 
             if data:
                 df = pd.DataFrame(data)
@@ -113,44 +126,46 @@ if st.session_state.page == "Dashboard":
                 st.line_chart(grouped)
             else:
                 st.info("No review data yet")
-        else:
+
+        except:
             st.error("Failed to load trends")
 
 elif st.session_state.page == "All Reviews":
 
     st.markdown("## 📝 All Reviews")
-    response = requests.get("http://localhost:8000/reviews")
 
-    if response.status_code == 200:
-        data = response.json()
+    try:
+        response = requests.get(API_REVIEWS, timeout=30)
+        data = response.json() if response.status_code == 200 else []
 
-        if len(data) == 0:
+        if not data:
             st.info("No reviews yet")
         else:
             df = pd.DataFrame(data)
             df = df[["review_text", "prediction", "confidence"]]
             df.columns = ["Review", "Prediction", "Confidence"]
             st.dataframe(df, use_container_width=True)
-    else:
+
+    except:
         st.error("Failed to fetch reviews")
 
 elif st.session_state.page == "Flagged Reviews":
 
     st.markdown("## 🚩 Flagged Reviews")
 
-    response = requests.get("http://localhost:8000/flagged")
+    try:
+        response = requests.get(API_FLAGGED, timeout=30)
+        data = response.json() if response.status_code == 200 else []
 
-    if response.status_code == 200:
-        data = response.json()
-
-        if len(data) == 0:
+        if not data:
             st.info("No flagged reviews yet")
         else:
             df = pd.DataFrame(data)
             df = df[["review_text", "reason", "confidence"]]
             df.columns = ["Review", "Reason", "Confidence"]
             st.dataframe(df, use_container_width=True)
-    else:
+
+    except:
         st.error("Failed to fetch flagged reviews")
 
 elif st.session_state.page == "Reports":
@@ -171,20 +186,3 @@ elif st.session_state.page == "Reports":
         file_name="fake_review_report.csv",
         mime="text/csv"
     )
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
