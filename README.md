@@ -1,200 +1,118 @@
-# Fake_Review_Detector
-# 🕵️ Fake Review Detection & Explanation Tool
+AI Fake Review Detector : 
 
-An AI-powered system that detects suspicious product reviews and explains **why** they are likely fake using rule-based detection, RAG (retrieval), and LLM explanations.
+An AI-powered web application that detects whether a product review is fake or genuine using LLM analysis.
 
-This project includes a **FastAPI backend** and **Streamlit admin dashboard**.
+The application uses FastAPI for the backend, Streamlit for the frontend, and Groq LLM for intelligent review analysis. The entire project is containerized using Docker for easy deployment.
 
----
+Features:
 
-## 🚀 Features
+1 .Detect fake product reviews using AI
 
-* Detect fake vs genuine reviews
-* Confidence score
-* Explainable AI output
-* Retrieval-Augmented Generation (RAG)
-* Stores reviews in SQLite database
-* Admin dashboard for monitoring
-* Works across all e-commerce platforms
+2 .LLM-powered analysis using Groq API
 
----
+3 .Interactive UI built with Streamlit
 
-## 🧠 Architecture
+4 .Fast backend API with FastAPI
 
-```
-User → Streamlit UI → FastAPI → Detection → RAG → LLM Explanation → Database
-```
+5 .Fully containerized using Docker
 
----
+6 .Stores review data using SQLite
 
-## 📁 Project Structure
+Project Architecture :
 
-```
-backend/
+User
+ ↓
+Streamlit Frontend
+ ↓
+FastAPI Backend
+ ↓
+Groq LLM API
+ ↓
+SQLite Database 
+
+Project Structure :
+
+final_project
 │
-├── database/
-│   ├── db.py          # DB connection
-│   └── deps.py        # dependency injection
+├── backend
+│   ├── database
+│   ├── models
+│   ├── routes
+│   ├── services
+│   ├── main.py
+│   ├── database.db
+│   ├── Dockerfile
+│   └── requirements.txt
 │
-├── models/
-│   ├── pydantic.py    # API schemas
-│   └── tables.py      # SQLAlchemy tables
+├── frontend
+│   ├── streamlit.py
+│   ├── Dockerfile
+│   └── requirements.txt
 │
-├── reviews/
-│   └── historical_review.txt   # RAG knowledge base
-│
-├── routes/
-│   └── routes.py      # API endpoints
-│
-├── services/
-│   ├── data.py        # fake review detection logic
-│   ├── rag.py         # retrieval + FAISS
-│   └── explain.py     # LLM explanation
-│
-├── database.db        # SQLite database
-└── main.py            # FastAPI entry point
-```
+├── docker-compose.yml
+├── .env.example
+├── .gitignore
+└── README.md
 
----
 
-## 🛠️ Tech Stack
+Installation : 
 
-* FastAPI
-* Streamlit
-* SQLAlchemy
-* SQLite
-* FAISS
-* Sentence Transformers
-* Groq LLM API
-* Python
+Clone the repository:
+git clone https://github.com/yourusername/Fake_Review_Detector.git
 
----
 
-## ⚙️ Setup Instructions
+Environment Variables :
 
-### 1. Clone repository
+Create a .env file in the root directory.
 
-```bash
-git clone https://github.com/YOUR_USERNAME/fake-review-detector.git
-cd fake-review-detector
-```
+Example:
 
-### 2. Create virtual environment
+GROQ_API_KEY=your_groq_api_key_here
 
-```bash
-python -m venv venv
-venv\Scripts\activate
-```
+You can get an API key from:
 
-### 3. Install dependencies
+https://console.groq.com/  
 
-```bash
-pip install fastapi uvicorn streamlit sqlalchemy sentence-transformers faiss-cpu groq
-```
+Run With Docker (Build and start the application) :
 
----
+command = docker compose up --build
 
-## 🔑 Environment Variable
+Access the Application : 
 
-Create `.env` file in backend folder:
+Frontend (Streamlit):
 
-```
-GROQ_API_KEY=your_api_key_here
-```
+http://localhost:8501
 
----
+Backend API:
 
-## ▶️ Run Backend
-
-```bash
-cd backend
-uvicorn main:app --reload
-```
-
-Backend URL:
-
-```
 http://localhost:8000
-```
 
----
+API Documentation:
 
-## ▶️ Run Frontend
+http://localhost:8000/docs
 
-```bash
-cd frontend
-streamlit run app.py
-```
+Example Review :
 
----
+Try entering a review like:
 
-## 📡 API Endpoints
+This product is amazing and works perfectly!  or
 
-### Analyze Review
+Worst product ever. Totally useless.
 
-```
-POST /analyze
-```
+The AI will analyze whether the review is fake or genuine.
 
-**Request**
+Technologies Used :
 
-```json
-{
-  "review": "Received this product for free in exchange for review"
-}
-```
+1 .Python
 
-**Response**
+2 .FastAPI
 
-```json
-{
-  "prediction": "Fake",
-  "confidence": 0.85,
-  "explanation": "...",
-  "suspicious_phrases": ["free", "exchange"],
-  "similar_reviews": [...]
-}
-```
+3 .Streamlit
 
----
+4 .Groq LLM
 
-### Get all reviews
+5 .SQLite
 
-```
-GET /reviews
-```
+6 .Docker
 
-### Get flagged reviews
-
-```
-GET /flagged
-```
-
----
-
-## 🧠 How it Works
-
-1. User submits review
-2. Detection engine checks suspicious patterns
-3. RAG retrieves similar historical reviews
-4. LLM explains why review looks fake
-5. Results stored in database
-6. Dashboard displays analytics
-
----
-
-## 📊 Dataset
-
-Uses:
-
-* Custom historical reviews
-* User-provided reviews
-
----
-
-## 🔒 Ethics
-
-* Does not scrape e-commerce sites
-* Focuses on explainable AI
-
----
+7 .Docker Compose
