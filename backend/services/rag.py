@@ -1,9 +1,11 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import text
+from dotenv import load_dotenv
 from groq import Groq
 import re
 import os
- 
+
+load_dotenv()
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 def generate_explain(review, suspicious_phrases):
