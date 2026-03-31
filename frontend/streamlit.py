@@ -7,7 +7,7 @@ st.set_page_config(
     layout="wide"
 )
 
-BASE_URL = "https://fakereviewdetector-production.up.railway.app"
+BASE_URL = "http://127.0.0.1:8000"
 
 API_ANALYZE = f"{BASE_URL}/analyze"
 API_STATS = f"{BASE_URL}/stats"
