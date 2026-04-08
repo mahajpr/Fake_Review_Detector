@@ -25,7 +25,7 @@ This project helps improve trust in online platforms by detecting misleading or 
 * **Backend:** FastAPI
 * **Frontend:** Streamlit
 * **Database:** SQLite (if used)
-* **Concepts:**RAG
+* Concepts:RAG
 
 ---
 
@@ -60,11 +60,8 @@ Fake_Review_detector/
 
 ```
 
----
-
 ## ⚙️ Installation
 
-```bash
 git clone https://github.com/your-username/fake-review-detector.git
 cd fake-review-detector
 pip install -r requirements.txt
