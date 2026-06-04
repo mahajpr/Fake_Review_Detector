@@ -88,7 +88,7 @@ if st.session_state.page == "Dashboard":
             st.markdown("### Explanation & Similar Reviews")
             st.success(r.get("explanation", "No explanation"))
 
-            st.markdown("#### 📚 Similar Historical Reviews")
+            st.markdown("#### Similar Historical Reviews")
             for sim in r.get("similar_reviews", []):
                 st.warning(sim)
 
@@ -100,15 +100,15 @@ if st.session_state.page == "Dashboard":
 
             if r.get("prediction") == "Fake":
                 st.error(
-                    f"🚨 Fake Review — {int(r.get('confidence', 0)*100)}% Confidence"
+                    f" Fake Review — {int(r.get('confidence', 0)*100)}% Confidence"
                 )
             else:
                 st.success(
-                    f"✅ Genuine Review — {int(r.get('confidence', 0)*100)}% Confidence"
+                    f"Genuine Review — {int(r.get('confidence', 0)*100)}% Confidence"
                 )
 
             if r.get("suspicious_phrases"):
-                st.markdown("**⚠️ Suspicious Phrases Detected**")
+                st.markdown("** Suspicious Phrases Detected**")
                 st.write(", ".join(r["suspicious_phrases"]))
 
         st.markdown("### Recent Review Trends")
@@ -132,7 +132,7 @@ if st.session_state.page == "Dashboard":
 
 elif st.session_state.page == "All Reviews":
 
-    st.markdown("## 📝 All Reviews")
+    st.markdown("##  All Reviews")
 
     try:
         response = requests.get(API_REVIEWS, timeout=30)
@@ -151,7 +151,7 @@ elif st.session_state.page == "All Reviews":
 
 elif st.session_state.page == "Flagged Reviews":
 
-    st.markdown("## 🚩 Flagged Reviews")
+    st.markdown("##  Flagged Reviews")
 
     try:
         response = requests.get(API_FLAGGED, timeout=30)
@@ -170,7 +170,7 @@ elif st.session_state.page == "Flagged Reviews":
 
 elif st.session_state.page == "Reports":
 
-    st.markdown("## 📊 Reports")
+    st.markdown("##  Reports")
 
     report_data = pd.DataFrame({
         "Month": ["Jan", "Feb", "Mar", "Apr"],
